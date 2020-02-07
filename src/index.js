@@ -1,9 +1,19 @@
 const root = document.getElementById('root');
 const boardSpace = document.createElement('div');
 root.appendChild(boardSpace)
+root.style.width = '100%';
+root.style.height = '100%'; 
+root.style.textAlign= 'center';
+root.style.backgroundColor='orange';
 boardSpace.style.width = '410px';
-boardSpace.style.height = '410px';
-boardSpace.style.backgroundColor='green';
+boardSpace.style.display = 'flex'
+boardSpace.style.flexWrap = 'wrap'
+boardSpace.style.height = '550px';
+boardSpace.style.textAlign= 'center';
+boardSpace.style.borderColor ='Black';
+;
+
+
 
 const GAME_STATE = {
     isPLayerOneTurn : true,
@@ -50,6 +60,10 @@ const renderCell=(
                 flipCoinsHL(appState,x,y)
                 flipCoinsVD(appState,x,y)
                 flipCoinsVU(appState,x,y)
+                flipCoinsIDD(appState,x,y)
+                flipCoinsIDU(appState,x,y)
+                flipCoinsILU(appState,x,y)
+                flipCoinsILD(appState,x,y)
                 appState.isPLayerOneTurn = !isPLayerOneTurn;
                 root.innerHTML = '';
                 render(root, appState);
@@ -60,12 +74,17 @@ const renderCell=(
                 flipCoinsHL(appState,x,y)
                 flipCoinsVD(appState,x,y)
                 flipCoinsVU(appState,x,y)
+                flipCoinsIDD(appState,x,y)
+                flipCoinsIDU(appState,x,y)
+                flipCoinsILU(appState,x,y)
+                flipCoinsILD(appState,x,y)
                 appState.isPLayerOneTurn = !isPLayerOneTurn;
                 root.innerHTML = '';
                 render(root, appState);
             }
         }
     }
+    
     root.appendChild(cell);
 }
 const render=(
@@ -73,6 +92,8 @@ const render=(
     appState,
 ) =>{
     const {isPLayerOneTurn, boardState} = appState;
+    renderTitle(mount)
+    renderTurn(mount,appState)
     boardState.map(
         (row, rowIndex) => row.map(
             (number,columId) =>{
@@ -80,7 +101,56 @@ const render=(
             }
         )
     )
+    
+    
 }
+const renderTurn = (
+    mount, 
+    appState,
+) =>{
+    const {isPLayerOneTurn} = appState;
+    const title = document.createElement('div');
+    title.style.backgroundColor = 'orange';
+    title.style.display = 'inline-box';
+    title.style.width = '410px'
+    if(isPLayerOneTurn){
+        const text = document.createElement('div');
+        const coin= document.createElement('div');
+        text.innerHTML="CURRENTLY PLAYING"
+        coin.style.backgroundColor = 'white';
+        coin.style.textAlign = 'center';
+        coin.style.verticalAlign= 'middle'
+        coin.style.border='5px'
+        coin.style.width= '50px'
+        coin.style.height= '50px'
+        coin.style.borderRadius='25px';
+        title.appendChild(text)
+        title.appendChild(coin)
+    }else{
+        title.innerHTML="CURRENTLY PLAYING:"
+        const coin= document.createElement('div');
+        title.innerHTML="CURRENTLY PLAYING"
+        title.style.textAlign='center';
+        title.style.backgroundColor = 'orange';
+        coin.style.backgroundColor = 'black';
+        coin.style.textAlign = 'center';
+        coin.style.border='5px'
+        coin.style.width= '50px'
+        coin.style.height= '50px'
+        coin.style.borderRadius='25px';
+        title.appendChild(coin)
+    }
+    mount.appendChild(title)
+}
+const renderTitle =(mount) =>{
+    const title =document.createElement('div')
+    title.innerHTML= 'OTHELO';
+    title.style.textAlign ='center';
+    title.style.fontSize='50px';
+    title.style.color ='green';
+    mount.appendChild(title)
+}
+// Functions that check game rules 
 const flipCoinsHR = function (GAME_STATE, xpos, ypos){
     const{isPLayerOneTurn, boardState}= GAME_STATE;
     let nextEqualCoinY=null;
@@ -88,7 +158,7 @@ const flipCoinsHR = function (GAME_STATE, xpos, ypos){
         if(isPLayerOneTurn){
             if(boardState[xpos][i]===1){
                 nextEqualCoinY =i
-                break
+                    break
             }
             else if(boardState[xpos][i]===0){
                 break
@@ -156,31 +226,34 @@ const flipCoinsVD = function (GAME_STATE, xpos, ypos){
         if(isPLayerOneTurn){
             if(boardState[i][ypos]===1){
                 nextEqualCoinX =i
-                break
+                break;
             }
             else if(boardState[i][ypos]===0){
-                break
+                break;
             }
         }
         else{
             if(boardState[i][ypos]=== -1){
                 nextEqualCoinX =i
-                break
+                break;
             }
             else if(boardState[i][ypos]===0){
-                break
+                break;
             }
         }
     } 
     if(nextEqualCoinX!== null){
         for(var i = xpos; i< nextEqualCoinX; i++){
             if(isPLayerOneTurn && boardState[i][ypos]!==0){
-                boardState[i][ypos]=1
+                boardState[i][ypos]=1;
             }
             else if(!isPLayerOneTurn && boardState[i][ypos]!==0){
-                boardState[i][ypos]=-1
+                boardState[i][ypos]=-1;
             }
         }
+        return true;
+    }else{
+        return false;
     }
 }
 const flipCoinsVU = function (GAME_STATE, xpos, ypos){
@@ -213,6 +286,186 @@ const flipCoinsVU = function (GAME_STATE, xpos, ypos){
             }
             else if(!isPLayerOneTurn && boardState[i][ypos]!==0){
                 boardState[i][ypos]=-1
+            }
+        }
+    }
+}
+const flipCoinsIDD = function (GAME_STATE, xpos, ypos){
+    const{isPLayerOneTurn, boardState}= GAME_STATE;
+    let nextEqualCoinX = null;
+    let nextEqualCoinY=null;
+    let currX = xpos + 1;
+    let currY = ypos + 1;
+    let foundCoin = false;
+    while(!foundCoin && currX<8 && currY<8){
+        if(isPLayerOneTurn){
+            if(boardState[currX][currY]=== 1){
+                foundCoin = true;
+            }
+            else if(boardState[currX][currY]=== 0){
+                break
+            }
+            else{
+                currX+=1;
+                currY+=1;
+            }
+        }else{
+            if(boardState[currX][currY]=== -1){
+                foundCoin = true;
+            }
+            else if(boardState[currX][currY]=== 0){
+                break
+            }
+            else{
+                currX+=1;
+                currY+=1;
+            }
+        }
+    }   
+    if(foundCoin){
+        for(var k = xpos; k< currX; k++){
+            for(var l = ypos; l < currY; l++ ){
+                if(isPLayerOneTurn && boardState[k][l]!==0 ){
+                    boardState[k][l]=1
+                }
+                else if(!isPLayerOneTurn && boardState[k][l]!==0 ){
+                    boardState[k][l]=-1
+                }
+            }
+        }
+    }
+}
+const flipCoinsIDU = function (GAME_STATE, xpos, ypos){
+    const{isPLayerOneTurn, boardState}= GAME_STATE;
+    let nextEqualCoinX = null;
+    let nextEqualCoinY=null;
+    let currX = xpos - 1;
+    let currY = ypos - 1;
+    let foundCoin = false;
+    while(!foundCoin && currX>0 && currY>0){
+        if(isPLayerOneTurn){
+            if(boardState[currX][currY]=== 1){
+                foundCoin = true;
+            }
+            else if(boardState[currX][currY]=== 0){
+                break
+            }
+            else{
+                currX-=1;
+                currY-=1;
+            }
+        }else{
+            if(boardState[currX][currY]=== -1){
+                foundCoin = true;
+            }
+            else if(boardState[currX][currY]=== 0){
+                break
+            }
+            else{
+                currX-=1;
+                currY-=1;
+            }
+        }
+    }   
+    if(foundCoin){
+        for(var k = xpos; k> currX; k--){
+            for(var l = ypos; l > currY; l-- ){
+                if(isPLayerOneTurn && boardState[k][l]!==0){
+                    boardState[k][l]=1
+                }
+                else if(!isPLayerOneTurn && boardState[k][l]!==0){
+                    boardState[k][l]=-1
+                }
+            }
+        }
+    }
+}
+const flipCoinsILU = function (GAME_STATE, xpos, ypos){
+    const{isPLayerOneTurn, boardState}= GAME_STATE;
+    let nextEqualCoinX = null;
+    let nextEqualCoinY=null;
+    let currX = xpos - 1;
+    let currY = ypos + 1;
+    let foundCoin = false;
+    while(!foundCoin && currX>0 && currY<8){
+        if(isPLayerOneTurn){
+            if(boardState[currX][currY]=== 1){
+                foundCoin = true;
+            }
+            else if(boardState[currX][currY]=== 0){
+                break
+            }
+            else{
+                currX-=1;
+                currY+=1;
+            }
+        }else{
+            if(boardState[currX][currY]=== -1){
+                foundCoin = true;
+            }
+            else if(boardState[currX][currY]=== 0){
+                break
+            }
+            else{
+                currX-=1;
+                currY+=1;
+            }
+        }
+    }   
+    if(foundCoin){
+        for(var k = xpos; k> currX; k--){
+            for(var l = ypos; l < currY; l++ ){
+                if(isPLayerOneTurn && boardState[k][l]!==0){
+                    boardState[k][l]=1
+                }
+                else if(!isPLayerOneTurn && boardState[k][l]!==0){
+                    boardState[k][l]=-1
+                }
+            }
+        }
+    }
+}
+const flipCoinsILD = function (GAME_STATE, xpos, ypos){
+    const{isPLayerOneTurn, boardState}= GAME_STATE;
+    let nextEqualCoinX = null;
+    let nextEqualCoinY=null;
+    let currX = xpos + 1;
+    let currY = ypos - 1;
+    let foundCoin = false;
+    while(!foundCoin && currX<8 && currY>0){
+        if(isPLayerOneTurn){
+            if(boardState[currX][currY]=== 1){
+                foundCoin = true;
+            }
+            else if(boardState[currX][currY]=== 0){
+                break
+            }
+            else{
+                currX+=1;
+                currY-=1;
+            }
+        }else{
+            if(boardState[currX][currY]=== -1){
+                foundCoin = true;
+            }
+            else if(boardState[currX][currY]=== 0){
+                break
+            }
+            else{
+                currX+=1;
+                currY-=1;
+            }
+        }
+    }   
+    if(foundCoin){
+        for(var k = xpos; k< currX; k++){
+            for(var l = ypos; l > currY; l-- ){
+                if(isPLayerOneTurn && boardState[k][l]!==0){
+                    boardState[k][l]=1
+                }
+                else if(!isPLayerOneTurn && boardState[k][l]!==0){
+                    boardState[k][l]=-1
+                }
             }
         }
     }
