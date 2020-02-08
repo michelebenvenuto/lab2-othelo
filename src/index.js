@@ -1,20 +1,7 @@
 const root = document.getElementById('root');
-const boardSpace = document.createElement('div');
-root.appendChild(boardSpace)
-root.style.width = '100%';
+root.style.width = '410px'
 root.style.height = '100%'; 
-root.style.textAlign= 'center';
 root.style.backgroundColor='orange';
-boardSpace.style.width = '410px';
-boardSpace.style.display = 'flex'
-boardSpace.style.flexWrap = 'wrap'
-boardSpace.style.height = '550px';
-boardSpace.style.textAlign= 'center';
-boardSpace.style.borderColor ='Black';
-;
-
-
-
 const GAME_STATE = {
     isPLayerOneTurn : true,
     boardState :[
@@ -28,7 +15,6 @@ const GAME_STATE = {
         [0,0,0,0,0,0,0,0]
     ]
 }
-
 const renderCell=(
     root,
     boardNumber,
@@ -87,22 +73,30 @@ const renderCell=(
     
     root.appendChild(cell);
 }
+const renderBoard = (
+    mount
+) =>{
+    const boardSpace = document.createElement('div');
+    boardSpace.style.width = '410px';
+    boardSpace.style.height = '550px';
+    boardSpace.style.borderColor ='Black';
+    mount.appendChild(boardSpace)
+    return boardSpace
+}
 const render=(
     mount,
     appState,
 ) =>{
-    const {isPLayerOneTurn, boardState} = appState;
-    renderTitle(mount)
-    renderTurn(mount,appState)
+    renderTitle(mount);
+    renderTurn(mount,appState);
+    const {isPLayerOneTurn, boardState} = appState;    
     boardState.map(
         (row, rowIndex) => row.map(
             (number,columId) =>{
-                renderCell(mount,number,rowIndex, columId, appState);
+                renderCell(boardSpace,number,rowIndex, columId, appState);
             }
         )
     )
-    
-    
 }
 const renderTurn = (
     mount, 
@@ -470,4 +464,5 @@ const flipCoinsILD = function (GAME_STATE, xpos, ypos){
         }
     }
 }
+const boardSpace = renderBoard(root)
 render(boardSpace,GAME_STATE)
